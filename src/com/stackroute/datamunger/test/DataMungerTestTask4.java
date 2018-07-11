@@ -74,8 +74,8 @@ private static DataMunger dataMunger;
 	@Test
 	public void testGetAggregateFunctionsFailure()
 	{
-		assertNotNull("testGetAggregateFunctionsFailure() :Aggregate function does not return the correct values",
-				dataMunger.getAggregateFunctions("select count(city),sum(win_by_runs),min(win_by_runs) from ipl.csv"));
+		assertNull("testGetAggregateFunctionsFailure() :Aggregate function does not return the correct values",
+				dataMunger.getAggregateFunctions(" String output[]=out.trim().split(\" \");"));
 	}
 	
 

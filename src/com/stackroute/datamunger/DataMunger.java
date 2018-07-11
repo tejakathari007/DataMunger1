@@ -34,8 +34,9 @@ public class DataMunger {
 	 */
 
 	public String[] getSplitStrings(String queryString) {
-
-		return null;
+		String lowerQuery = queryString.toLowerCase();
+		String[] queryelements = lowerQuery.split("\\s");
+		return queryelements;
 	}
 
 	/*
@@ -47,8 +48,14 @@ public class DataMunger {
 	 */
 
 	public String getFileName(String queryString) {
-
-		return null;
+		String result = "";
+		String[] queryParts = queryString.split(" ");
+		for (int i = 0; i < queryParts.length; i++) {
+			if (queryParts[i].equals("from")) {
+				result = queryParts[i + 1];
+			}
+		}
+		return result;
 	}
 
 	/*
@@ -60,10 +67,10 @@ public class DataMunger {
 	 * by clause 3. The query might not contain where, but can contain both group by
 	 * and order by clause
 	 */
-	
-	public String getBaseQuery(String queryString) {
 
-		return null;
+	public String getBaseQuery(String queryString) {
+		String[] baseQuery = queryString.toLowerCase().trim().split(" where | order by | group by ");
+		return baseQuery[0];
 	}
 
 	/*
@@ -72,15 +79,16 @@ public class DataMunger {
 	 * fields will be stored in a String array which is to be printed in console as
 	 * well as to be returned by the method
 	 * 
-	 * Note: 1. The field name or value in the condition can contain keywords
-	 * as a substring. For eg: from_city,job_order_no,group_no etc. 2. The field
-	 * name can contain '*'
+	 * Note: 1. The field name or value in the condition can contain keywords as a
+	 * substring. For eg: from_city,job_order_no,group_no etc. 2. The field name can
+	 * contain '*'
 	 * 
 	 */
-	
-	public String[] getFields(String queryString) {
 
-		return null;
+	public String[] getFields(String queryString) {
+		String[] part = queryString.split("select | from");
+		String[] fieldNames = part[1].split(",");
+		return fieldNames;
 	}
 
 	/*
@@ -88,14 +96,21 @@ public class DataMunger {
 	 * conditions part contains starting from where keyword till the next keyword,
 	 * which is either group by or order by clause. In case of absence of both group
 	 * by and order by clause, it will contain till the end of the query string.
-	 * Note:  1. The field name or value in the condition can contain keywords
-	 * as a substring. For eg: from_city,job_order_no,group_no etc. 2. The query
-	 * might not contain where clause at all.
+	 * Note: 1. The field name or value in the condition can contain keywords as a
+	 * substring. For eg: from_city,job_order_no,group_no etc. 2. The query might
+	 * not contain where clause at all.
 	 */
-	
-	public String getConditionsPartQuery(String queryString) {
 
-		return null;
+	public String getConditionsPartQuery(String queryString) {
+		String result = "";
+		String lowerQuery = queryString.toLowerCase();
+		if (lowerQuery.contains(" where ")) {
+			String[] conditionspart = lowerQuery.split("where | (group by|order by)");
+			result += conditionspart[1];
+		} else {
+			result = null;
+		}
+		return result;
 	}
 
 	/*
@@ -114,66 +129,105 @@ public class DataMunger {
 	 */
 
 	public String[] getConditions(String queryString) {
-
-		return null;
+		String[] result = null;
+		String lowerQuery = queryString.toLowerCase();
+		if (lowerQuery.contains(" where ")) {
+			String[] conditions = lowerQuery.trim().split(" where | group by | order by ");
+			result = conditions[1].trim().split(" and | or | not ");
+		}
+		return result;
 	}
 
 	/*
 	 * This method will extract logical operators(AND/OR) from the query string. The
 	 * extracted logical operators will be stored in a String array which will be
-	 * returned by the method and the same will be printed Note:  1. AND/OR
-	 * keyword will exist in the query only if where conditions exists and it
-	 * contains multiple conditions. 2. AND/OR can exist as a substring in the
-	 * conditions as well. For eg: name='Alexander',color='Red' etc. Please consider
-	 * these as well when extracting the logical operators.
+	 * returned by the method and the same will be printed Note: 1. AND/OR keyword
+	 * will exist in the query only if where conditions exists and it contains
+	 * multiple conditions. 2. AND/OR can exist as a substring in the conditions as
+	 * well. For eg: name='Alexander',color='Red' etc. Please consider these as well
+	 * when extracting the logical operators.
 	 * 
 	 */
 
 	public String[] getLogicalOperators(String queryString) {
-
-		return null;
+		String[] result = null;
+		String str = "";
+		if ((queryString.contains("and")) || (queryString.contains("or")) || (queryString.contains("not"))) {
+			String[] queryelements = queryString.split("\\s");
+			for (int i = 0; i < queryelements.length; i++) {
+				if (queryelements[i].matches("and|or|not")) {
+					str += queryelements[i] + " ";
+				}
+			}
+			result = str.split(" ");
+		}
+		return result;
 	}
 
 	/*
-	 * This method extracts the order by fields from the query string. Note: 
-	 * 1. The query string can contain more than one order by fields. 2. The query
-	 * string might not contain order by clause at all. 3. The field names,condition
-	 * values might contain "order" as a substring. For eg:order_number,job_order
-	 * Consider this while extracting the order by fields
+	 * This method extracts the order by fields from the query string. Note: 1. The
+	 * query string can contain more than one order by fields. 2. The query string
+	 * might not contain order by clause at all. 3. The field names,condition values
+	 * might contain "order" as a substring. For eg:order_number,job_order Consider
+	 * this while extracting the order by fields
 	 */
 
 	public String[] getOrderByFields(String queryString) {
-
-		return null;
+		String[] part;
+		String[] result = null;
+		if (queryString.contains("order by ")) {
+			String parts[] = queryString.split("order by ");
+			part = parts[1].split(",");
+			result = part;
+		}
+		return result;
 	}
 
 	/*
-	 * This method extracts the group by fields from the query string. Note:
-	 * 1. The query string can contain more than one group by fields. 2. The query
-	 * string might not contain group by clause at all. 3. The field names,condition
-	 * values might contain "group" as a substring. For eg: newsgroup_name
+	 * This method extracts the group by fields from the query string. Note: 1. The
+	 * query string can contain more than one group by fields. 2. The query string
+	 * might not contain group by clause at all. 3. The field names,condition values
+	 * might contain "group" as a substring. For eg: newsgroup_name
 	 * 
 	 * Consider this while extracting the group by fields
 	 */
 
 	public String[] getGroupByFields(String queryString) {
-
-		return null;
+		String[] part;
+		String[] result = null;
+		if (queryString.contains("group by ")) {
+			String parts[] = queryString.split("group by ");
+			part = parts[1].split(",");
+			result = part;
+		}
+		return result;
 	}
 
 	/*
-	 * This method extracts the aggregate functions from the query string. Note:
-	 *  1. aggregate functions will start with "sum"/"count"/"min"/"max"/"avg"
-	 * followed by "(" 2. The field names might
-	 * contain"sum"/"count"/"min"/"max"/"avg" as a substring. For eg:
-	 * account_number,consumed_qty,nominee_name
+	 * This method extracts the aggregate functions from the query string. Note: 1.
+	 * aggregate functions will start with "sum"/"count"/"min"/"max"/"avg" followed
+	 * by "(" 2. The field names might contain"sum"/"count"/"min"/"max"/"avg" as a
+	 * substring. For eg: account_number,consumed_qty,nominee_name
 	 * 
 	 * Consider this while extracting the aggregate functions
 	 */
 
 	public String[] getAggregateFunctions(String queryString) {
+		String output = "";
+		String[] result = null;
+		String[] query1 = queryString.split(" ");
+		String[] query = query1[1].split(",");
+		for (int i = 0; i < query.length; i++) {
+			if ((query[i].startsWith("max(") && query[i].endsWith(")"))
+					|| (query[i].startsWith("min(") && query[i].endsWith(")"))
+					|| (query[i].startsWith("count(") && query[i].endsWith(")"))
+					|| (query[i].startsWith("avg(") && query[i].endsWith(")"))
+					|| (query[i].startsWith("sum") && query[i].endsWith(")"))) {
+				output += query[i] + " ";
+				result = output.trim().split(" ");
+			}
+		}
 
-		return null;
+		return result;
 	}
-
 }
