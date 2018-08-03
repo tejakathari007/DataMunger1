@@ -191,7 +191,6 @@ public class DataMunger {
 	 * 
 	 * Consider this while extracting the group by fields
 	 */
-
 	public String[] getGroupByFields(String queryString) {
 		String[] part;
 		String[] result = null;
